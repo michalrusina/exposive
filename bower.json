@@ -1,7 +1,7 @@
 {
-	"name": "featurette",
+	"name": "exposive",
 	"version": "1.0.0",
-	"main": "public/featurette.js",
+	"main": "public/exposive.js",
 	"dependencies": {
 		"jquery": "^2.1.1"
 	}

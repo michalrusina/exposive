@@ -1,6 +1,6 @@
 /*
- * featurette v1.0.0 09/10/2014
- * http://github.com/michalrusina/featurette
+ * exposive v1.0.0 09/10/2014
+ * http://github.com/michalrusina/exposive
  *
  * Michal Rusina
  * email@michalrusina.sk
@@ -15,7 +15,7 @@
 				interval: 6000,
 				arrowText: false,
 				bulletText: false,
-				featuretteClass: 'feature',
+				exposiveClass: 'feature',
 				arrowClass: 'arrows',
 				bulletClass: 'bullets',
 				event: 'click',
@@ -24,29 +24,29 @@
 
 			return this.each(function(options) {
 				var $this = $(this),
-				data = $this.data('featurette');
+				data = $this.data('exposive');
 
 				if (data !== undefined) return;
 
-				var featurettes = $this.find('.' + settings.featuretteClass),
-					size = featurettes.size(),
+				var exposives = $this.find('.' + settings.exposiveClass),
+					size = exposives.size(),
 					current = 0,
 					data = {
 						settings: settings,
-						featurettes: featurettes,
+						exposives: exposives,
 						size: size,
 						current: current
 					}
 
 				$this
-				.data('featurette', data)
-				.trigger('init.featurette')
-				.featurette('decorate')
-				.featurette('move', 0)
-				.featurette('resume')
+				.data('exposive', data)
+				.trigger('init.exposive')
+				.exposive('decorate')
+				.exposive('move', 0)
+				.exposive('resume')
 				.hover(
-					function() { $(this).addClass('hover').featurette('pause'); },
-					function() { $(this).removeClass('hover').featurette('resume'); }
+					function() { $(this).addClass('hover').exposive('pause'); },
+					function() { $(this).removeClass('hover').exposive('resume'); }
 				);
 			});
 		},
@@ -54,8 +54,8 @@
 		move: function(index) {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('featurette'),
-					featurettes = data.featurettes,
+					data = $this.data('exposive'),
+					exposives = data.exposives,
 					callback = data.settings.callback;
 
 				if (index <= 0) index = 0;
@@ -68,17 +68,17 @@
 				.eq(index).addClass('active')
 				.siblings().removeClass('active');
 
-				var current = featurettes
+				var current = exposives
 					.removeClass('previous active next')
 					.eq(index).addClass('active'),
-					previous = featurettes.eq((index <= 0) ? data.size - 1 : index - 1).addClass('previous'),
-					next = featurettes.eq((index >= data.size - 1) ? 0 : index + 1).addClass('next');
+					previous = exposives.eq((index <= 0) ? data.size - 1 : index - 1).addClass('previous'),
+					next = exposives.eq((index >= data.size - 1) ? 0 : index + 1).addClass('next');
 
 				$this
 				.toggleClass('first', index === 0)
 				.toggleClass('last', index === data.size - 1)
-				.data('featurette', data)
-				.trigger('move.featurette');
+				.data('exposive', data)
+				.trigger('move.exposive');
 
 				if (callback !== false) callback($this, current, previous, next);
 			});
@@ -87,39 +87,39 @@
 		next: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('featurette'),
+					data = $this.data('exposive'),
 					index = data.current + 1;
 
 				if (index === data.size) index = 0;
 
 				$this
-				.trigger('next.featurette')
-				.featurette('move', index);
+				.trigger('next.exposive')
+				.exposive('move', index);
 			});
 		},
 
 		previous: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('featurette'),
+					data = $this.data('exposive'),
 					index = data.current - 1;
 
 				if (index < 0) index = data.size - 1;
 
 				$this
-				.trigger('previous.featurette')
-				.featurette('move', index);
+				.trigger('previous.exposive')
+				.exposive('move', index);
 			});
 		},
 
 		resume: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('featurette');
+					data = $this.data('exposive');
 
 				if (data.interval === undefined || data.settings.pause) {
 					clearInterval(data.interval);
-					data.interval = setInterval(function() { $this.featurette('next'); }, data.settings.interval);
+					data.interval = setInterval(function() { $this.exposive('next'); }, data.settings.interval);
 				}
 			});
 		},
@@ -127,7 +127,7 @@
 		pause: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('featurette');
+					data = $this.data('exposive');
 
 				if (data.settings.pause) clearInterval(data.interval);
 			});
@@ -136,7 +136,7 @@
 		decorate: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('featurette'),
+					data = $this.data('exposive'),
 					arrowContainer = $this.find('.' + data.settings.arrowClass),
 					bulletContainer = $this.find('.' + data.settings.bulletClass);
 
@@ -158,17 +158,17 @@
 				else data.bullets = bulletContainer;
 
 				$this
-				.data('featurette', data)
+				.data('exposive', data)
 				.find('.' + data.settings.arrowClass + ' > *, .' + data.settings.bulletClass + ' > *')
 				.on(data.settings.event, function($event) {
 					var $element = $(this),
-						data = $this.data('featurette');
+						data = $this.data('exposive');
 
 					$event.preventDefault();
 
-					if ($element.hasClass('bullet')) $this.featurette('move', data.bullets.children().index($element));
-					if ($element.hasClass('previous')) $this.featurette('previous');
-					if ($element.hasClass('next')) $this.featurette('next');
+					if ($element.hasClass('bullet')) $this.exposive('move', data.bullets.children().index($element));
+					if ($element.hasClass('previous')) $this.exposive('previous');
+					if ($element.hasClass('next')) $this.exposive('next');
 				});
 			});
 		},
@@ -176,22 +176,22 @@
 		destroy: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('featurette');
+					data = $this.data('exposive');
 
 				$this
-				.trigger('destroy.featurette')
-				.removeData('featurette')
+				.trigger('destroy.exposive')
+				.removeData('exposive')
 				.removeClass('first last hover')
-				.off('.featurette');
+				.off('.exposive');
 
-				data.featurettes.removeClass('previous next active')
+				data.exposives.removeClass('previous next active')
 				data.arrows.remove();
 				data.bullets.remove();
 			});
 		}
 	};
 
-	$.fn.featurette = function(method) {
+	$.fn.exposive = function(method) {
 		if (methods[method]) return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		else if (typeof method === 'object' || !method) return methods.init.apply(this, arguments);
 	};
