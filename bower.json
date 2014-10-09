@@ -1,0 +1,8 @@
+{
+	"name": "Slide",
+	"version": "1.0.0",
+	"main": "public/slide.js",
+	"dependencies": {
+		"jquery": "^2.1.1"
+	}
+}
