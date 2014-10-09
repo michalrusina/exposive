@@ -1,6 +1,6 @@
 /*
- * Slide v1.0.0 09/10/2014
- * http://github.com/michalrusina/slide
+ * featurette v1.0.0 09/10/2014
+ * http://github.com/michalrusina/featurette
  *
  * Michal Rusina
  * email@michalrusina.sk
@@ -15,7 +15,7 @@
 				interval: 6000,
 				arrowText: false,
 				bulletText: false,
-				slideClass: 'feature',
+				featuretteClass: 'feature',
 				arrowClass: 'arrows',
 				bulletClass: 'bullets',
 				event: 'click',
@@ -24,29 +24,29 @@
 
 			return this.each(function(options) {
 				var $this = $(this),
-				data = $this.data('slide');
+				data = $this.data('featurette');
 
 				if (data !== undefined) return;
 
-				var slides = $this.find('.' + settings.slideClass),
-					size = slides.size(),
+				var featurettes = $this.find('.' + settings.featuretteClass),
+					size = featurettes.size(),
 					current = 0,
 					data = {
 						settings: settings,
-						slides: slides,
+						featurettes: featurettes,
 						size: size,
 						current: current
 					}
 
 				$this
-				.data('slide', data)
-				.trigger('init.slide')
-				.slide('decorate')
-				.slide('move', 0)
-				.slide('resume')
+				.data('featurette', data)
+				.trigger('init.featurette')
+				.featurette('decorate')
+				.featurette('move', 0)
+				.featurette('resume')
 				.hover(
-					function() { $(this).addClass('hover').slide('pause'); },
-					function() { $(this).removeClass('hover').slide('resume'); }
+					function() { $(this).addClass('hover').featurette('pause'); },
+					function() { $(this).removeClass('hover').featurette('resume'); }
 				);
 			});
 		},
@@ -54,8 +54,8 @@
 		move: function(index) {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('slide'),
-					slides = data.slides,
+					data = $this.data('featurette'),
+					featurettes = data.featurettes,
 					callback = data.settings.callback;
 
 				if (index <= 0) index = 0;
@@ -68,17 +68,17 @@
 				.eq(index).addClass('active')
 				.siblings().removeClass('active');
 
-				var current = slides
+				var current = featurettes
 					.removeClass('previous active next')
 					.eq(index).addClass('active'),
-					previous = slides.eq((index <= 0) ? data.size - 1 : index - 1).addClass('previous'),
-					next = slides.eq((index >= data.size - 1) ? 0 : index + 1).addClass('next');
+					previous = featurettes.eq((index <= 0) ? data.size - 1 : index - 1).addClass('previous'),
+					next = featurettes.eq((index >= data.size - 1) ? 0 : index + 1).addClass('next');
 
 				$this
 				.toggleClass('first', index === 0)
 				.toggleClass('last', index === data.size - 1)
-				.data('slide', data)
-				.trigger('move.slide');
+				.data('featurette', data)
+				.trigger('move.featurette');
 
 				if (callback !== false) callback($this, current, previous, next);
 			});
@@ -87,39 +87,39 @@
 		next: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('slide'),
+					data = $this.data('featurette'),
 					index = data.current + 1;
 
 				if (index === data.size) index = 0;
 
 				$this
-				.trigger('next.slide')
-				.slide('move', index);
+				.trigger('next.featurette')
+				.featurette('move', index);
 			});
 		},
 
 		previous: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('slide'),
+					data = $this.data('featurette'),
 					index = data.current - 1;
 
 				if (index < 0) index = data.size - 1;
 
 				$this
-				.trigger('previous.slide')
-				.slide('move', index);
+				.trigger('previous.featurette')
+				.featurette('move', index);
 			});
 		},
 
 		resume: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('slide');
+					data = $this.data('featurette');
 
 				if (data.interval === undefined || data.settings.pause) {
 					clearInterval(data.interval);
-					data.interval = setInterval(function() { $this.slide('next'); }, data.settings.interval);
+					data.interval = setInterval(function() { $this.featurette('next'); }, data.settings.interval);
 				}
 			});
 		},
@@ -127,7 +127,7 @@
 		pause: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('slide');
+					data = $this.data('featurette');
 
 				if (data.settings.pause) clearInterval(data.interval);
 			});
@@ -136,7 +136,7 @@
 		decorate: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('slide'),
+					data = $this.data('featurette'),
 					arrowContainer = $this.find('.' + data.settings.arrowClass),
 					bulletContainer = $this.find('.' + data.settings.bulletClass);
 
@@ -158,17 +158,17 @@
 				else data.bullets = bulletContainer;
 
 				$this
-				.data('slide', data)
+				.data('featurette', data)
 				.find('.' + data.settings.arrowClass + ' > *, .' + data.settings.bulletClass + ' > *')
 				.on(data.settings.event, function($event) {
 					var $element = $(this),
-						data = $this.data('slide');
+						data = $this.data('featurette');
 
 					$event.preventDefault();
 
-					if ($element.hasClass('bullet')) $this.slide('move', data.bullets.children().index($element));
-					if ($element.hasClass('previous')) $this.slide('previous');
-					if ($element.hasClass('next')) $this.slide('next');
+					if ($element.hasClass('bullet')) $this.featurette('move', data.bullets.children().index($element));
+					if ($element.hasClass('previous')) $this.featurette('previous');
+					if ($element.hasClass('next')) $this.featurette('next');
 				});
 			});
 		},
@@ -176,22 +176,22 @@
 		destroy: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('slide');
+					data = $this.data('featurette');
 
 				$this
-				.trigger('destroy.slide')
-				.removeData('slide')
+				.trigger('destroy.featurette')
+				.removeData('featurette')
 				.removeClass('first last hover')
-				.off('.slide');
+				.off('.featurette');
 
-				data.slides.removeClass('previous next active')
+				data.featurettes.removeClass('previous next active')
 				data.arrows.remove();
 				data.bullets.remove();
 			});
 		}
 	};
 
-	$.fn.slide = function(method) {
+	$.fn.featurette = function(method) {
 		if (methods[method]) return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		else if (typeof method === 'object' || !method) return methods.init.apply(this, arguments);
 	};
