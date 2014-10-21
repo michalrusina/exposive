@@ -1,8 +1,8 @@
 {
+	"authors": [
+		"Michal Rusina <email@michalrusina.sk> (http://www.michalrusina.sk)"
+	],
+	"license": "MIT",
 	"name": "exposive",
-	"version": "1.0.0",
-	"main": "public/exposive.js",
-	"dependencies": {
-		"jquery": "^2.1.1"
-	}
+	"main": "public/exposive.js"
 }
