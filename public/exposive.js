@@ -13,20 +13,21 @@
 	'use strict';
 
 	var methods = {
-		init: function(options) {
-			var settings = $.extend({ // jshint ignore:line
+		init: function(init) {
+			var opts = $.extend({
 				pause: true,
 				interval: 6000,
-				arrowText: false,
-				bulletText: false,
-				exposiveClass: 'feature',
-				arrowClass: 'arrows',
-				bulletClass: 'bullets',
 				event: 'click',
-				callback: false
-			}, options);
+				callback: false,
+				slideSelector: '.slide',
+				arrowText: false,
+				arrowSelector: '.arrows a',
+				bulletText: false,
+				bulletSelector: '.bullets a',
+				bulletContainer: '.bullets'
+			}, init);
 
-			return this.each(function(settings) {
+			return this.each(function() {
 				var $this = $(this),
 				data = $this.data('exposive');
 
@@ -34,22 +35,21 @@
 					return;
 				}
 
-				var exposives = $this.find('.' + settings.exposiveClass),
-					size = exposives.size(),
+				var slides = $this.exposive('_get', opts.slideSelector),
+					size = slides.size(),
 					current = 0;
 
 				data = {
-					settings: settings,
-					exposives: exposives,
+					opts: opts,
+					slides: slides,
 					size: size,
 					current: current
 				};
 
 				$this
 				.data('exposive', data)
-				.trigger('init.exposive')
 				.exposive('decorate')
-				.exposive('move', 0)
+				.exposive('goto', 0)
 				.exposive('resume')
 				.hover(
 					function() {
@@ -62,18 +62,16 @@
 			});
 		},
 
-		move: function(index) {
+		goto: function(index) {
 			return this.each(function() {
 				var $this = $(this),
 					data = $this.data('exposive'),
-					exposives = data.exposives,
-					callback = data.settings.callback;
+					slides = data.slides,
+					callback = data.opts.callback;
 
 				if (index <= 0) {
 					index = 0;
-				}
-
-				if (index >= data.size) {
+				} else if (index >= data.size) {
 					index = data.size - 1;
 				}
 
@@ -81,22 +79,20 @@
 
 				if (data.bullets !== undefined) {
 					data.bullets
-					.children()
 					.eq(index).addClass('active')
 					.siblings().removeClass('active');
 				}
 
-				var current = exposives
+				var current = slides
 					.removeClass('previous active next')
 					.eq(index).addClass('active'),
-					previous = exposives.eq((index <= 0) ? data.size - 1 : index - 1).addClass('previous'),
-					next = exposives.eq((index >= data.size - 1) ? 0 : index + 1).addClass('next');
+					previous = slides.eq((index <= 0) ? data.size - 1 : index - 1).addClass('previous'),
+					next = slides.eq((index >= data.size - 1) ? 0 : index + 1).addClass('next');
 
 				$this
 				.toggleClass('first', index === 0)
 				.toggleClass('last', index === data.size - 1)
-				.data('exposive', data)
-				.trigger('move.exposive');
+				.data('exposive', data);
 
 				if (callback !== false) {
 					callback($this, current, previous, next);
@@ -104,35 +100,20 @@
 			});
 		},
 
-		next: function() {
+
+		move: function(dir) {
 			return this.each(function() {
 				var $this = $(this),
 					data = $this.data('exposive'),
-					index = data.current + 1;
+					index = data.current + dir;
 
-				if (index === data.size) {
+				if (index >= data.size) {
 					index = 0;
-				}
-
-				$this
-				.trigger('next.exposive')
-				.exposive('move', index);
-			});
-		},
-
-		previous: function() {
-			return this.each(function() {
-				var $this = $(this),
-					data = $this.data('exposive'),
-					index = data.current - 1;
-
-				if (index < 0) {
+				} else if (index <= 0) {
 					index = data.size - 1;
 				}
 
-				$this
-				.trigger('previous.exposive')
-				.exposive('move', index);
+				$this.exposive('goto', index);
 			});
 		},
 
@@ -141,12 +122,12 @@
 				var $this = $(this),
 					data = $this.data('exposive');
 
-				if (data.interval === undefined || data.settings.pause) {
+				if (data.interval === undefined || data.opts.pause) {
 					clearInterval(data.interval);
 
 					data.interval = setInterval(function() {
-						$this.exposive('next');
-					}, data.settings.interval);
+						$this.exposive('move', 1);
+					}, data.opts.interval);
 				}
 			});
 		},
@@ -156,7 +137,7 @@
 				var $this = $(this),
 					data = $this.data('exposive');
 
-				if (data.settings.pause) {
+				if (data.opts.pause) {
 					clearInterval(data.interval);
 				}
 			});
@@ -165,69 +146,56 @@
 		decorate: function() {
 			return this.each(function() {
 				var $this = $(this),
-					data = $this.data('exposive'),
-					arrowContainer = $this.find('.' + data.settings.arrowClass),
-					bulletContainer = $this.find('.' + data.settings.bulletClass);
+					data = $this.data('exposive');
 
-				if (data.settings.arrowText !== false) {
-					var arrows = '<a class="previous" href="#">' + data.settings.arrowText[0] + '</a><a class="next" href="#">' + data.settings.arrowText[1] + '</a>';
-
-					data.arrows = (arrowContainer.size()) ? arrowContainer.append(arrows) : $('<nav class="' + data.settings.arrowClass + '">' + arrows + '</nav>').appendTo($this);
-				} else {
-					data.arrows = arrowContainer;
+				if (data.opts.arrowContainer !== false) {
+					data.arrowContainer = (data.opts.arrowContainer === '') ? data.arrowContainer = $('<nav class="arrows"></nav>').appendTo($this) : $this.exposive('_get', data.opts.arrowContainer);
 				}
 
-				if (data.settings.bulletText !== false) {
-					var bullets = '';
+				if (data.opts.arrowText && data.arrowContainer.size() && data.opts.arrowText.length === 2) {
+					data.arrows = $('<button class="previous">' + data.opts.arrowText[0] + '</button><button class="next">' + data.opts.arrowText[1] + '</button>').appendTo(data.arrowContainer);
+				} else {
+					data.arrows = $this.exposive('_get', data.opts.arrowSelector);
+				}
+
+				if (data.opts.bulletContainer !== false) {
+					data.bulletContainer = (data.opts.bulletContainer === '') ? $('<nav class="bullets"></nav>').appendTo($this) : $this.exposive('_get', data.opts.bulletContainer);
+				}
+
+				if (data.opts.bulletText && data.bulletContainer.size()) {
+					var	bullets = '';
 
 					for (var i = 1; i < data.size + 1; i += 1) {
-						bullets += '<a class="bullet" href="#">' + data.settings.bulletText.replace('$', i) + '</a>';
+						bullets += '<button>' + data.opts.bulletText.replace('$', i) + '</button>';
 					}
 
-					data.bullets = (bulletContainer.size()) ? bulletContainer.append(bullets) : $('<nav class="' + data.settings.bulletClass + '">' + bullets +'</nav>').appendTo($this);
+					data.bullets = $(bullets).appendTo(data.bulletContainer);
 				} else {
-					data.bullets = bulletContainer;
+					data.bullets = $this.exposive('_get', data.opts.bulletSelector);
 				}
 
-				$this
-				.data('exposive', data)
-				.find('.' + data.settings.arrowClass + ' > *, .' + data.settings.bulletClass + ' > *')
-				.on(data.settings.event, function($event) {
-					var $element = $(this),
-						data = $this.data('exposive');
-
+				data.arrows.on(data.opts.event, function($event) {
 					$event.preventDefault();
 
-					if ($element.hasClass('bullet')) {
-						$this.exposive('move', data.bullets.children().index($element));
+					if ($(this).hasClass('previous')) {
+						$this.exposive('move', -1);
+					} else if ($(this).hasClass('next')) {
+						$this.exposive('move', 1);
 					}
+				});
 
-					if ($element.hasClass('previous')) {
-						$this.exposive('previous');
-					}
+				data.bullets.on(data.opts.event, function($event) {
+					$event.preventDefault();
 
-					if ($element.hasClass('next')) {
-						$this.exposive('next');
-					}
+					$this.exposive('goto', $this.data('exposive').bullets.index($(this)));
 				});
 			});
 		},
 
-		destroy: function() {
-			return this.each(function() {
-				var $this = $(this),
-					data = $this.data('exposive');
+		_get: function(element) {
+			var $this = $(this);
 
-				$this
-				.trigger('destroy.exposive')
-				.removeData('exposive')
-				.removeClass('first last hover')
-				.off('.exposive');
-
-				data.exposives.removeClass('previous next active');
-				data.arrows.remove();
-				data.bullets.remove();
-			});
+			return (element instanceof jQuery) ? element : $this.find(element);
 		}
 	};
 
