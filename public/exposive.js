@@ -1,5 +1,5 @@
 /*
- * exposive v2.0.2 08/08/2015
+ * exposive v2.0.3 08/08/2015
  * http://github.com/michalrusina/exposive
  *
  * Michal Rusina
@@ -39,8 +39,8 @@
 				var slides = $this.exposive('_get', opts.slideSelector),
 					size = slides.size(),
 					current = 0;
-					
-				if (!size) {
+
+				if (size < 2) {
 					return;
 				}
 
