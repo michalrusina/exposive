@@ -38,6 +38,10 @@
 				var slides = $this.exposive('_get', opts.slideSelector),
 					size = slides.size(),
 					current = 0;
+					
+				if (!size) {
+					return;
+				}
 
 				data = {
 					opts: opts,
