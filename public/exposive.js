@@ -1,5 +1,5 @@
 /*
- * exposive v1.0.0 09/10/2014
+ * exposive v2.0.2 08/08/2015
  * http://github.com/michalrusina/exposive
  *
  * Michal Rusina
@@ -22,9 +22,10 @@
 				slideSelector: '.slide',
 				arrowText: false,
 				arrowSelector: '.arrows a',
+				arrowContainer: '',
 				bulletText: false,
 				bulletSelector: '.bullets a',
-				bulletContainer: '.bullets'
+				bulletContainer: ''
 			}, init);
 
 			return this.each(function() {
@@ -113,7 +114,7 @@
 
 				if (index >= data.size) {
 					index = 0;
-				} else if (index <= 0) {
+				} else if (index < 0) {
 					index = data.size - 1;
 				}
 
